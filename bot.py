@@ -9,7 +9,7 @@ import discord
 from discord import errors
 import requests
 import socket
-import conf as config
+import conf as config 
 
 bot = discord.Client()
 baseUrl = f"https://api.telegram.org/bot{config.TELEGRAM_BOT_TOKEN}"

@@ -1,7 +1,7 @@
 
 # The Discord user token. It is a bit hard to obtain. You can follow the online tutorial here to
 # obtain your user token for discord. Tutorial: https://www.youtube.com/watch?v=tI1lzqzLQCs&feature=emb_logo
-USER_DISCORD_TOKEN = "discord_user_token_here"
+USER_DISCORD_TOKEN = 'NzE0MDcxMjcxNzcxNzM0MDQ2.XspUzw.9umL2DgXFRL7x54mFxnqvo9E7dw'
 
 # Go to your telegram account.
 # In the left upper corner in the search box search fot BotFather
@@ -11,7 +11,7 @@ USER_DISCORD_TOKEN = "discord_user_token_here"
 # Now after the username is set BotFather will give you your bot token paste it here below.
 # Altenatively, Follow this (https://core.telegram.org/bots#6-botfather) to create your bot on telegram. It's super easy.
 
-TELEGRAM_BOT_TOKEN = "bot_token_here"
+TELEGRAM_BOT_TOKEN = '1105725049:AAGtuXqby-hog2INCN_v_nULv_bCej9lpNg'
 
 
 
