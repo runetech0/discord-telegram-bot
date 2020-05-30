@@ -1,4 +1,3 @@
 discord
 requests
-socks
-socket
+pysocks
