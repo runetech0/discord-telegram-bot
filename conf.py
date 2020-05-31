@@ -38,6 +38,14 @@ serversList = {
 
 #SOCKS5 proxy settings
 # Set PROXY to False to disable the proxy settings
+
 PROXY = True
 SOCKS5_SERVER = '5.133.197.203'
 SOCKS5_PORT = 49768
+
+# If proxy requires authentication then set AUTHETICATIN to True to enable.
+AUTHENTICATION = False
+USERNAME = None
+PASSWORD = None
+
+

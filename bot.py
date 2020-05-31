@@ -74,7 +74,14 @@ def sendMsg(url):
 
 
 if config.PROXY:
-    socks.set_default_proxy(socks.SOCKS5, config.SOCKS5_SERVER, config.SOCKS5_PORT)
+    if config.AUTHENTICATION:
+        if config.USERNAME != None and config.PASSWORD != None:
+            socks.set_default_proxy(socks.SOCKS5, config.SOCKS5_SERVER, config.SOCKS5_PORT, config.USERNAME, config.PASSWORD)
+        else:
+            print(f"[-] Proxy authentication enabled but username/password not found.")
+            quit()
+    elif not config.AUTHENTICATION:
+        socks.set_default_proxy(socks.SOCKS5, config.SOCKS5_SERVER, config.SOCKS5_PORT)
     socket.socket = socks.socksocket
     print(f"\n[+] Activated Proxy\n[+] Proxy Server: {config.SOCKS5_SERVER}:{config.SOCKS5_PORT}")
     print(f"[+] Please wait for at least 30 seconds before first message.")
