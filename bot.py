@@ -55,10 +55,29 @@ def matchChannel(channel, list):
     return found
 
 
+def sendMsg(url):
+    while True:
+        try:
+            print(f"[+] Sending Message to Telegram ...")
+            resp = requests.post(url)
+            if resp.status_code == 200:
+                print("[+] Message sent!\n")
+                break
+            elif resp.status_code != 200:
+                raise OSError
+        except OSError:
+            print("[-] Sending failed!\n[+] Trying again ...")
+            continue
+        except KeyboardInterrupt:
+            print("\n[+] Please wait untill all messages in queue are sent!\n")
+
+
+
 if config.PROXY:
     socks.set_default_proxy(socks.SOCKS5, config.SOCKS5_SERVER, config.SOCKS5_PORT)
     socket.socket = socks.socksocket
-    print(f"[+] Activated Proxy\n[+] Proxy Server: {config.SOCKS5_SERVER}:{config.SOCKS5_PORT}")
+    print(f"\n[+] Activated Proxy\n[+] Proxy Server: {config.SOCKS5_SERVER}:{config.SOCKS5_PORT}")
+    print(f"[+] Please wait for at least 30 seconds before first message.")
 
 
 @bot.event
@@ -66,31 +85,32 @@ async def on_message(message):
     serverName = message.guild.name
     serversList = config.serversList.keys()
     channelName = message.channel.name
-    print(f"Server: {serverName}, Channel: {channelName}")
+    #print(f"Server: {serverName}, Channel: {channelName}")
     if serverName in serversList:
         channelsList = config.serversList[serverName]
         if matchChannel(channelName, channelsList):
-            print(f"Matched channel: {channelName}")
+            print(f"\n-------------------------------------------\n[+] Channel: {channelName}")
             if message.content:
                 if message.mentions:
                     message.content = replaceMentions(message.mentions, message.content, channel=False)
                 if message.channel_mentions:
                     message.content = replaceMentions(message.channel_mentions, message.content, channel=True)
                 toSend = f"{message.guild}/{message.channel}/{message.author.name}: {message.content}"
+                print(f"[+] Message: {toSend}")
                 url = f"{baseUrl}/sendMessage?text={toSend}&chat_id={config.TELEGRAM_RECEIVER_CHAT_ID}"
-                requests.post(url)
-                print("Message sent!")
+                sendMsg(url)
+
                 if message.attachments:
                     attachmentUrl = message.attachments[0].url
                     if isPhoto(attachmentUrl):
                         url = f"{baseUrl}/sendPhoto?photo={attachmentUrl}&chat_id={config.TELEGRAM_RECEIVER_CHAT_ID}"
-                        requests.post(url)
+                        sendMsg(url)
                     elif isVideo(attachmentUrl):
                         url = f"{baseUrl}/sendVideo?video={attachmentUrl}&chat_id={config.TELEGRAM_RECEIVER_CHAT_ID}"
-                        requests.post(url)
+                        sendMsg(url)
                     elif isDoc(attachmentUrl):
                         url = f"{baseUrl}/sendDocument?document={attachmentUrl}&chat_id={config.TELEGRAM_RECEIVER_CHAT_ID}"
-                        requests.post(url)
+                        sendMsg(url)
                 
             if message.embeds:
                 embed = message.embeds[0].to_dict()
@@ -103,18 +123,17 @@ async def on_message(message):
                     elif 'description' in embed.keys():
                         toSend = f"{message.guild}/{message.channel}/{message.author.name}: {embed['description']}"
                     url = f"{baseUrl}/sendMessage?text='{toSend}'&chat_id={config.TELEGRAM_RECEIVER_CHAT_ID}"
-                    requests.post(url)
+                    sendMsg(url)
                     # print(embed)
                 elif str(embed['type']) == "link":
                     toSend = f"{embed['title']}\n{embed['description']}\n{embed['url']}"
                     url = f"{baseUrl}/sendMessage?text='{toSend}'&chat_id={config.TELEGRAM_RECEIVER_CHAT_ID}"
-                    requests.post(url)
+                    sendMsg(url)
 
 
 #Run the bot using the user token
 try:
     bot.run(config.USER_DISCORD_TOKEN, bot=False)
-    #print(f"\n-------------------------------\n[+] Bot is up!\n-------------------------------\n")
 except RuntimeError:
     print("\n\nPlease Wait ...\nShutting down the bot ... \n")
     quit()

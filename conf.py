@@ -1,7 +1,7 @@
 
 # The Discord user token. It is a bit hard to obtain. You can follow the online tutorial here to
 # obtain your user token for discord. Tutorial: https://www.youtube.com/watch?v=tI1lzqzLQCs&feature=emb_logo
-USER_DISCORD_TOKEN = 'NzE0MDcxMjcxNzcxNzM0MDQ2.XspUzw.9umL2DgXFRL7x54mFxnqvo9E7dw'
+USER_DISCORD_TOKEN = 'NzE0MDcxMjcDgXFRL7x54mFxnqvo9E7dw'
 
 # Go to your telegram account.
 # In the left upper corner in the search box search fot BotFather
@@ -11,7 +11,7 @@ USER_DISCORD_TOKEN = 'NzE0MDcxMjcxNzcxNzM0MDQ2.XspUzw.9umL2DgXFRL7x54mFxnqvo9E7d
 # Now after the username is set BotFather will give you your bot token paste it here below.
 # Altenatively, Follow this (https://core.telegram.org/bots#6-botfather) to create your bot on telegram. It's super easy.
 
-TELEGRAM_BOT_TOKEN = '1105725049:AAGtuXqby-hog2INCN_v_nULv_bCej9lpNg'
+TELEGRAM_BOT_TOKEN = '1105725nULv_bCej9lpNg'
 
 
 
@@ -31,10 +31,7 @@ TELEGRAM_RECEIVER_CHAT_ID = -1001499013531      #"telegram_channel_chat_id_here"
 # Configure the channels and server here to from where you want to receive the messages.
 
 serversList = {
-    "Server-Name": ["Channel1", "Channel2", "Channel3", "Channel4"],
-    "Python": ["discord․py", "help-sodium", "help-zinc", "help-carbon", "help-magincium"],
-    "r/Jailbreak": ["general", "checkra1n", "development"],
-    "EngineerMan": ["oof-topic"]
+    "botter server": ["help", "rules", "members", "general", "instructions"]
 }
 
 
@@ -42,5 +39,5 @@ serversList = {
 #SOCKS5 proxy settings
 # Set PROXY to False to disable the proxy settings
 PROXY = True
-SOCKS5_SERVER = '79.164.43.214'
-SOCKS5_PORT = 9050
+SOCKS5_SERVER = '5.133.197.203'
+SOCKS5_PORT = 49768
