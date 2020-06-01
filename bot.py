@@ -77,13 +77,14 @@ if config.PROXY:
     if config.AUTHENTICATION:
         if config.USERNAME != None and config.PASSWORD != None:
             socks.set_default_proxy(socks.SOCKS5, config.SOCKS5_SERVER, config.SOCKS5_PORT, username=config.USERNAME, password=config.PASSWORD)
+            print(f"[+] Proxy enabled with authentication set!\n[+] Proxy Server: {config.SOCKS5_SERVER}:{config.SOCKS5_PORT}")
         else:
-            print(f"[-] Proxy authentication enabled but username/password not found.")
+            print(f"[-] Proxy authentication enabled but username/password not set.")
             quit()
     elif not config.AUTHENTICATION:
         socks.set_default_proxy(socks.SOCKS5, config.SOCKS5_SERVER, config.SOCKS5_PORT)
+        print(f"[+] Proxy enabled without authentication!\n[+] Proxy Server: {config.SOCKS5_SERVER}:{config.SOCKS5_PORT}")
     socket.socket = socks.socksocket
-    print(f"\n[+] Activated Proxy\n[+] Proxy Server: {config.SOCKS5_SERVER}:{config.SOCKS5_PORT}")
     print(f"[+] Please wait for at least 30 seconds before first message.")
 
 
