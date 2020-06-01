@@ -76,7 +76,7 @@ def sendMsg(url):
 if config.PROXY:
     if config.AUTHENTICATION:
         if config.USERNAME != None and config.PASSWORD != None:
-            socks.set_default_proxy(socks.SOCKS5, config.SOCKS5_SERVER, config.SOCKS5_PORT, config.USERNAME, config.PASSWORD)
+            socks.set_default_proxy(socks.SOCKS5, config.SOCKS5_SERVER, config.SOCKS5_PORT, username=config.USERNAME, password=config.PASSWORD)
         else:
             print(f"[-] Proxy authentication enabled but username/password not found.")
             quit()
