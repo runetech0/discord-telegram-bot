@@ -5,6 +5,8 @@ Python version used: Python3
 
 NOTE: Please don't mess with code if you don't understand what you are doing.
 '''
+
+import conf as config 
 import socks
 import discord
 from discord import errors
@@ -12,9 +14,23 @@ import requests
 import socket
 import re
 import logging
-import conf as config 
+from box import Box as box
+from colorama import Back, Fore, init, Style
 
-logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s', level=logging.WARNING)
+# errorLogger = logging.getLogger(__name__)
+# errorLogger.setLevel(logging.ERROR)
+# errorLogger.addHandler()
+init(autoreset=True)
+colorSchemes = {
+    'SUCCESS': f"{Back.GREEN}{Fore.BLACK}{Style.NORMAL}",
+    'FAILURE': f"{Back.RED}{Fore.WHITE}{Style.BRIGHT}",
+    'WARNING': f"{Back.YELLOW}{Fore.BLACK}{Style.BRIGHT}",
+    'RESET': f"{Style.RESET_ALL}"
+}
+colorSchemes = box(colorSchemes)
+
+logging.basicConfig(format=f'{colorSchemes.WARNING}[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s', level=logging.WARNING)
+
 
 
 bot = discord.Client()
@@ -86,18 +102,18 @@ def sendMsg(url):
                 print(f"[+] Sending Message to Telegram ...")
                 resp = requests.post(url)
                 if resp.status_code == 200:
-                    print("[+] Message sent!\n")
+                    print(f"{colorSchemes.SUCCESS}[+] Message sent!\n")
                     break
                 elif resp.status_code != 200:
                     raise OSError
             except OSError:
                 attempts += 1
-                print(f"[-] Sending failed!\n[+] Trying again ... (Attempt {attempts})")
+                print(f"{colorSchemes.FAILURE}[-] Sending failed!\n[+] Trying again ... (Attempt {attempts})")
                 continue
             except KeyboardInterrupt:
                 print("\n[+] Please wait untill all messages in queue are sent!\n")
         else:
-            print(f"[-] Message was not sent in 5 attempts. \n[-] Please check your network.")
+            print(f"{colorSchemes.FAILURE}[-] Message was not sent in 5 attempts. \n[-] Please check your network.")
             break
 
 
@@ -110,7 +126,7 @@ if config.PROXY:
             socks.set_default_proxy(socks.SOCKS5, config.SOCKS5_SERVER, config.SOCKS5_PORT, username=config.USERNAME, password=config.PASSWORD)
             print(f"[+] Proxy enabled with authentication set!\n[+] Proxy Server: {config.SOCKS5_SERVER}:{config.SOCKS5_PORT}")
         else:
-            print(f"[-] Proxy authentication enabled but username/password not set.")
+            print(f"{colorSchemes.FAILURE}[-] Proxy authentication enabled but username/password not set.")
             quit()
     elif not config.AUTHENTICATION:
         socks.set_default_proxy(socks.SOCKS5, config.SOCKS5_SERVER, config.SOCKS5_PORT)
@@ -187,8 +203,8 @@ except RuntimeError:
     print("\n\nPlease Wait ...\nShutting down the bot ... \n")
     quit()
 except errors.HTTPException:
-    print("Invalid discord token or network down!")
+    print(f"{colorSchemes.FAILURE}Invalid discord token or network down!")
     quit()
 except errors.LoginFailure:
-    print("Login failed to discord. May be bad token or network down!")
+    print(f"{colorSchemes.FAILURE}Login failed to discord. May be bad token or network down!")
     quit()
