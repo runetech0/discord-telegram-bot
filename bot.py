@@ -10,7 +10,12 @@ import discord
 from discord import errors
 import requests
 import socket
+import re
+import logging
 import conf as config 
+
+logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s', level=logging.WARNING)
+
 
 bot = discord.Client()
 baseUrl = f"https://api.telegram.org/bot{config.TELEGRAM_BOT_TOKEN}"
@@ -19,11 +24,29 @@ baseUrl = f"https://api.telegram.org/bot{config.TELEGRAM_BOT_TOKEN}"
 def replaceMentions(mentions, msg, channel):
     if channel:
         for ch in mentions:
-            msg = msg.replace(str(f"#{ch.id}"), str(ch.name))
+            # msg = msg.replace(str(f"#{ch.id}"), '')
+            msg = re.sub(f"<#{ch.id}>", '', msg)
+            msg = re.sub(f"<{ch.id}>", '', msg)
+            msg = re.sub(f"<*{ch.id}>", '', msg)
+            msg = re.sub(f"<*{ch.id}*>", '', msg)
+            msg = re.sub(f"<{ch.id}*>", '', msg)
     elif not channel:
         for member in mentions:
-            msg = msg.replace(str(member.id), str(member.name))
+            msg = re.sub(f"<@{member.id}>", '', msg)
+            msg = re.sub(f"<@!{member.id}>", '', msg)
+            msg = re.sub(f"<{member.id}>", '', msg)
+            msg = re.sub(f"<*{member.id}*>", '', msg)
+            msg = re.sub(f"<{member.id}*>", '', msg)
+            msg = re.sub(f"<*{member.id}>", '', msg)
     return str(msg)
+
+def removeTags(msg):
+    msg = msg.replace('#', '%23')
+    msg = re.sub(r"@\w*", '', msg)
+    return msg
+
+
+
 
 def isPhoto(url):
     imgExts = ["png", "jpg", "jpeg", "webp"]
@@ -56,20 +79,28 @@ def matchChannel(channel, list):
 
 
 def sendMsg(url):
+    attempts = 0
     while True:
-        try:
-            print(f"[+] Sending Message to Telegram ...")
-            resp = requests.post(url)
-            if resp.status_code == 200:
-                print("[+] Message sent!\n")
-                break
-            elif resp.status_code != 200:
-                raise OSError
-        except OSError:
-            print("[-] Sending failed!\n[+] Trying again ...")
-            continue
-        except KeyboardInterrupt:
-            print("\n[+] Please wait untill all messages in queue are sent!\n")
+        if attempts < 5:
+            try:
+                print(f"[+] Sending Message to Telegram ...")
+                resp = requests.post(url)
+                if resp.status_code == 200:
+                    print("[+] Message sent!\n")
+                    break
+                elif resp.status_code != 200:
+                    raise OSError
+            except OSError:
+                attempts += 1
+                print(f"[-] Sending failed!\n[+] Trying again ... (Attempt {attempts})")
+                continue
+            except KeyboardInterrupt:
+                print("\n[+] Please wait untill all messages in queue are sent!\n")
+        else:
+            print(f"[-] Message was not sent in 5 attempts. \n[-] Please check your network.")
+            break
+
+
 
 
 
@@ -88,6 +119,9 @@ if config.PROXY:
     print(f"[+] Please wait for at least 30 seconds before first message.")
 
 
+
+
+
 @bot.event
 async def on_message(message):
     serverName = message.guild.name
@@ -100,10 +134,13 @@ async def on_message(message):
             print(f"\n-------------------------------------------\n[+] Channel: {channelName}")
             if message.content:
                 if message.mentions:
+                    # print(f"\n----------------\nUser Mentioned\n----------------")
                     message.content = replaceMentions(message.mentions, message.content, channel=False)
                 if message.channel_mentions:
+                    # print(f"\n----------------\nChannel Mentioned\n----------------")
                     message.content = replaceMentions(message.channel_mentions, message.content, channel=True)
                 toSend = f"{message.guild}/{message.channel}/{message.author.name}: {message.content}"
+                toSend = removeTags(toSend)
                 print(f"[+] Message: {toSend}")
                 url = f"{baseUrl}/sendMessage?text={toSend}&chat_id={config.TELEGRAM_RECEIVER_CHAT_ID}"
                 sendMsg(url)
@@ -126,16 +163,20 @@ async def on_message(message):
                 if str(embed['type']) == "rich":
                     if 'title' in embed.keys() and 'description' in embed.keys():
                         toSend = f"{message.guild}/{message.channel}/{message.author.name}: {embed['title']}\n{embed['description']}"
+                        toSend = removeTags(toSend)
                     elif 'title' in embed.keys():
                         toSend = f"{message.guild}/{message.channel}/{message.author.name}: {embed['title']}"
+                        toSend = removeTags(toSend)
                     elif 'description' in embed.keys():
                         toSend = f"{message.guild}/{message.channel}/{message.author.name}: {embed['description']}"
-                    url = f"{baseUrl}/sendMessage?text='{toSend}'&chat_id={config.TELEGRAM_RECEIVER_CHAT_ID}"
+                        toSend = removeTags(toSend)
+                    url = f"{baseUrl}/sendMessage?text={toSend}&chat_id={config.TELEGRAM_RECEIVER_CHAT_ID}"
                     sendMsg(url)
                     # print(embed)
                 elif str(embed['type']) == "link":
                     toSend = f"{embed['title']}\n{embed['description']}\n{embed['url']}"
-                    url = f"{baseUrl}/sendMessage?text='{toSend}'&chat_id={config.TELEGRAM_RECEIVER_CHAT_ID}"
+                    toSend = removeTags(toSend)
+                    url = f"{baseUrl}/sendMessage?text={toSend}&chat_id={config.TELEGRAM_RECEIVER_CHAT_ID}"
                     sendMsg(url)
 
 
