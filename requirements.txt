@@ -2,3 +2,5 @@ discord
 pysocks
 requests
 requests[socks]
+python-box
+colorama

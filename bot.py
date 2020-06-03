@@ -7,7 +7,7 @@ NOTE: Please don't mess with code if you don't understand what you are doing.
 '''
 
 import conf as config 
-import socks
+import socks 
 import discord
 from discord import errors
 import requests
