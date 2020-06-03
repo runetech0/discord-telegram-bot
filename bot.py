@@ -16,11 +16,10 @@ import re
 import logging
 from box import Box as box
 from colorama import Back, Fore, init, Style
+from aiohttp import client_exceptions as clientExcps
 
-# errorLogger = logging.getLogger(__name__)
-# errorLogger.setLevel(logging.ERROR)
-# errorLogger.addHandler()
 init(autoreset=True)
+
 colorSchemes = {
     'SUCCESS': f"{Back.GREEN}{Fore.BLACK}{Style.NORMAL}",
     'FAILURE': f"{Back.RED}{Fore.WHITE}{Style.BRIGHT}",
@@ -29,7 +28,7 @@ colorSchemes = {
 }
 colorSchemes = box(colorSchemes)
 
-logging.basicConfig(format=f'{colorSchemes.WARNING}[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s', level=logging.WARNING)
+logging.basicConfig(format=f'{colorSchemes.FAILURE}[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s', level=logging.ERROR)
 
 
 
@@ -57,8 +56,9 @@ def replaceMentions(mentions, msg, channel):
     return str(msg)
 
 def removeTags(msg):
-    msg = msg.replace('#', '%23')
     msg = re.sub(r"@\w*", '', msg)
+    msg = requests.utils.quote(msg)
+    #print(f"{colorSchemes.SUCCESS}Quoted message: {msg}")
     return msg
 
 
@@ -118,21 +118,19 @@ def sendMsg(url):
 
 
 
-
-
 if config.PROXY:
     if config.AUTHENTICATION:
         if config.USERNAME != None and config.PASSWORD != None:
             socks.set_default_proxy(socks.SOCKS5, config.SOCKS5_SERVER, config.SOCKS5_PORT, username=config.USERNAME, password=config.PASSWORD)
-            print(f"[+] Proxy enabled with authentication set!\n[+] Proxy Server: {config.SOCKS5_SERVER}:{config.SOCKS5_PORT}")
+            print(f"\n[+] Proxy enabled with authentication set!\n[+] Proxy Server: {config.SOCKS5_SERVER}:{config.SOCKS5_PORT}")
         else:
             print(f"{colorSchemes.FAILURE}[-] Proxy authentication enabled but username/password not set.")
             quit()
     elif not config.AUTHENTICATION:
         socks.set_default_proxy(socks.SOCKS5, config.SOCKS5_SERVER, config.SOCKS5_PORT)
-        print(f"[+] Proxy enabled without authentication!\n[+] Proxy Server: {config.SOCKS5_SERVER}:{config.SOCKS5_PORT}")
+        print(f"{colorSchemes.WARNING}[+] Proxy enabled without authentication!\n[+] Proxy Server: {config.SOCKS5_SERVER}:{config.SOCKS5_PORT}")
     socket.socket = socks.socksocket
-    print(f"[+] Please wait for at least 30 seconds before first message.")
+    print(f"{colorSchemes.WARNING}[+] Please wait for at least 30 seconds before first message.")
 
 
 
@@ -156,8 +154,8 @@ async def on_message(message):
                     # print(f"\n----------------\nChannel Mentioned\n----------------")
                     message.content = replaceMentions(message.channel_mentions, message.content, channel=True)
                 toSend = f"{message.guild}/{message.channel}/{message.author.name}: {message.content}"
-                toSend = removeTags(toSend)
                 print(f"[+] Message: {toSend}")
+                toSend = removeTags(toSend)
                 url = f"{baseUrl}/sendMessage?text={toSend}&chat_id={config.TELEGRAM_RECEIVER_CHAT_ID}"
                 sendMsg(url)
 
@@ -207,4 +205,7 @@ except errors.HTTPException:
     quit()
 except errors.LoginFailure:
     print(f"{colorSchemes.FAILURE}Login failed to discord. May be bad token or network down!")
+    quit()
+except clientExcps.ClientConnectionError:
+    print(f"{colorSchemes.FAILURE}[-] Proxy seems to be down or network problem.")
     quit()
