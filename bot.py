@@ -138,9 +138,12 @@ if config.PROXY:
 
 @bot.event
 async def on_message(message):
-    serverName = message.guild.name
-    serversList = config.serversList.keys()
-    channelName = message.channel.name
+    try:
+        serverName = message.guild.name
+        serversList = config.serversList.keys()
+        channelName = message.channel.name
+    except AttributeError:
+        pass
     #print(f"Server: {serverName}, Channel: {channelName}")
     if serverName in serversList:
         channelsList = config.serversList[serverName]
