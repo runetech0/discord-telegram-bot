@@ -32,7 +32,11 @@ logging.basicConfig(format=f'{colorSchemes.FAILURE}[%(levelname) 5s/%(asctime)s]
 
 
 
-bot = discord.Client()
+intents = discord.Intents.default()
+intents.message_content = True
+
+
+bot = discord.Client(intents=intents)
 baseUrl = f"https://api.telegram.org/bot{config.TELEGRAM_BOT_TOKEN}"
 
 
@@ -199,7 +203,7 @@ async def on_message(message):
 
 #Run the bot using the user token
 try:
-    bot.run(config.USER_DISCORD_TOKEN, bot=False)
+    bot.run(config.USER_DISCORD_TOKEN)
 except RuntimeError:
     print("\n\nPlease Wait ...\nShutting down the bot ... \n")
     quit()
