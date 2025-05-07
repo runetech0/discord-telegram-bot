@@ -1,3 +1,6 @@
+THE CODE IN THIS REPO IS CURRENTLY OUTDATED AND NO LONGER WORKS. PLEASE CONSIDER UPDATING YOURSELF OR USE SOME OTHER REPO. THANKS! 
+
+
 Installation:
 Using the bash on ubuntu linux or almost any other linux distro
 1:  cd BOT_FOLDER
